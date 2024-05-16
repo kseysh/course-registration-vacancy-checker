@@ -10,9 +10,5 @@ db.sqlite3
 # Environments
 inhaenv
 
-# migrations
-migrations
-! migrations/__init__.py
-
 # secret
 secrets.json
