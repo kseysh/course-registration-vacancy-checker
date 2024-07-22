@@ -12,3 +12,9 @@ inhaenv
 
 # secret
 secrets.json
+
+# etc
+.DS_Store
+
+# migrations
+config/sugang/migrations/**
