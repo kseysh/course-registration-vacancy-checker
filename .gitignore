@@ -16,5 +16,8 @@ secrets.json
 # etc
 .DS_Store
 
+# py file
+config/major_creator.py
+
 # migrations
 config/sugang/migrations/**
