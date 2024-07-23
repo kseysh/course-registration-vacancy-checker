@@ -1,6 +1,6 @@
 from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
-import json
+import json, os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -18,7 +18,7 @@ def get_secret(setting,secrets_dict = secrets):
 
 SECRET_KEY = get_secret('SECRET_KEY')
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -97,6 +97,11 @@ USE_I18N = True
 
 USE_TZ = True
 
-STATIC_URL = 'static/'
+
+STATIC_URL = '/static/'
+STATIC_DIR = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

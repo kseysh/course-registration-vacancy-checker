@@ -9,80 +9,9 @@
 </head>
 
 <body>
-	<div>
-		<!-- 
-		<div>
-			<span>학부(과)/전공</span>
-			<select title="학부/전공">
-				<option selected="selected" value="0194002">기계공학과 / 기계공학</option>
-				<option value="0198005">항공우주공학과 / 항공우주공학</option>
-				<option value="1583737">바이오제약공학과 / 바이오제약공학</option>
-			</select>
-			<input type="submit" value="조회">
-		</div> 
-		-->
+	{% include "search_box.html" %}
 
-		<!-- 과목명 검색 form-->
-		<form method="get" action="{% url 'search_course' %}">
-			<div> 
-				<span>과목명</span>
-				<input name="course_name" type="text" id="course_name" style="background:#fff; border:1; width: 90px">
-				<input type="submit" value="조회">
-			</div>
-		</form>
-		
-		<!-- 학수번호 전공 검색 form-->
-		<form method="get" action="{% url 'search_course' %}">
-			<div> 
-				<span>학수번호</span>
-				<input name="course_code" type="text" id="course_code" style="background:#fff; border:1; width: 90px">
-				<input type="submit" value="조회">
-			</div>
-		</form>
-	</div>
-
-	<table cellspacing="0" style="width:100%;border-collapse:collapse;" border="1">
-		<caption>
-			2024년 2학기 여석
-		</caption>
-		<thead>
-			<tr style="background: #0770BB; color: #fff;">
-				<th scope="col" style="width:12%;">학수번호</th>
-				<th scope="col" style="width:8%;">과목명</th>
-				<th scope="col" style="width:14%;">학년</th>
-				<th scope="col" style="width:5%;">학점</th>
-				<th scope="col" style="width:5%;">과목구분</th>
-				<th scope="col" style="width:12%;">담당교수</th>
-				<th scope="col" style="width:8%;">평가방식</th>
-				<th scope="col" style="width:8%;">비고</th>
-				<th scope="col" style="width:10%;">여석</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% if course_list %}
-			{% for course in course_list %}
-			<tr>
-				<th scope="col" style="width:12%;">{{ course.code }}</th>
-				<th scope="col" style="width:8%;">{{ course.name }}</th>
-				<th scope="col" style="width:14%;">{{ course.grade }}</th>
-				<th scope="col" style="width:5%;">{{ course.credit }}</th>
-				<th scope="col" style="width:5%;">{{ course.subject }}</th>
-				<th scope="col" style="width:12%;">{{ course.professor }}</th>
-				<th scope="col" style="width:8%;">{{ course.evaluation_method }}</th>
-				<th scope="col" style="width:8%;">{{ course.remarks }}</th>
-				<th scope="col" style="width:10%;">{{ course.enrollment_count }}/{{ course.enrollment_capacity }}</th>
-			</tr>
-			{% endfor %}
-			{% else %}
-			<tr>
-				<th>
-					찾는 과목이 없습니다.
-				</th>
-			</tr>
-			{% endif %}
-
-		</tbody>
-	</table>
+	{% include "course_table.html" %}
 </body>
 
 </html>

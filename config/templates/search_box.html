@@ -1,0 +1,57 @@
+<div style="margin: 0 auto; text-align: center;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        <form method="get" action="{% url 'search_course' %}">
+            <div style="display: flex; align-items: center;">
+                <span style="min-width: 80px; text-align: right; margin-right: 10px;">학부(과)/전공</span>
+                <select title="학부/전공" name="major_value" style="background:#fff; border:1px solid #000; width: 250px;">
+                    {% if major_name %}
+                        {% if majors %}
+                            {% for major in majors %}
+                            <option value="{{ major.value }}" {% if major.name == major_name %} selected {% endif %}>
+                                {{ major.name }}
+                            </option>
+                            {% endfor %}
+                        {% else %}
+                            <option value="error">오류</option>
+                        {% endif %}
+                    {% else %}
+                        {% if majors %}
+                            {% for major in majors %}
+                                <option value="{{ major.value }}">{{ major.name }}</option>
+                            {% endfor %}
+                        {% else %}
+                            <option value="error">오류</option>
+                        {% endif %}
+                    {% endif %}
+                </select>
+                <input type="submit" value="조회" style="margin-left: 10px;">
+            </div>
+        </form>
+
+        <!-- 과목명 검색 form-->
+        <form method="get" action="{% url 'search_course' %}">
+            <div style="display: flex; align-items: center;">
+                <span style="min-width: 80px; text-align: right; margin-right: 10px;">과목명</span>
+                {% if course_name %}
+                    <input name="course_name" type="text" id="course_name" style="background:#fff; border:1px solid #000; width: 250px;" minlength="3" placeholder="3글자 이상 작성하세요." value="{{ course_name }}">
+                {% else %}
+                    <input name="course_name" type="text" id="course_name" style="background:#fff; border:1px solid #000; width: 250px;" minlength="3" placeholder="3글자 이상 작성하세요.">
+                {% endif %}
+                <input type="submit" value="조회" style="margin-left: 10px;">
+            </div>
+        </form>
+
+        <!-- 학수번호 전공 검색 form-->
+        <form method="get" action="{% url 'search_course' %}">
+            <div style="display: flex; align-items: center;">
+                <span style="min-width: 80px; text-align: right; margin-right: 10px;">학수번호</span>
+                {% if course_code %}
+                    <input name="course_code" type="text" id="course_code" style="background:#fff; border:1px solid #000; width: 250px;" minlength="7" placeholder="학수번호 앞부분 7글자 이상 작성해주세요." size="20" value="{{ course_code }}">
+                {% else %}
+                    <input name="course_code" type="text" id="course_code" style="background:#fff; border:1px solid #000; width: 250px;" minlength="7" placeholder="학수번호 앞부분 7글자 이상 작성해주세요." size="20">
+                {% endif %}
+                <input type="submit" value="조회" style="margin-left: 10px;">
+            </div>
+        </form>
+    </div>
+</div>
