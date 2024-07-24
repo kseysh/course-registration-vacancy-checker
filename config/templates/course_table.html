@@ -1,6 +1,6 @@
 <table cellspacing="0" style="width:100%;border-collapse:collapse;" border="1">
     <caption style="text-align: left;">
-        2024년 2학기 여석
+        2024년 2학기 여석 확인 시스템
     </caption>
     <thead>
         <tr style="background: #0770BB; color: #fff;">
@@ -27,7 +27,7 @@
             <th scope="col" style="width:12%;">{{ course.professor }}</th>
             <th scope="col" style="width:8%;">{{ course.evaluation_method }}</th>
             <th scope="col" style="width:8%;">{{ course.remarks }}</th>
-            <th scope="col" style="width:10%;">{{ course.enrollment_count }}/{{ course.enrollment_capacity }}</th>
+            <th scope="col" style="width:10%;">{{ course.vacancy }}</th>
         </tr>
         {% endfor %}
         {% else %}

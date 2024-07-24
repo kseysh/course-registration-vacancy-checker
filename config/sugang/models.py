@@ -9,8 +9,7 @@ class Course(models.Model):
     classroom = models.CharField(verbose_name="강의실", max_length=256, default="")
     professor = models.CharField(verbose_name="담당교수", max_length=10, default="담당교수 미정")
     remarks = models.CharField(verbose_name="비고", max_length=10, default="")
-    enrollment_count = models.IntegerField(verbose_name="신청 인원수", default=0)
-    enrollment_capacity = models.IntegerField(verbose_name="신청 정원", default=0)
+    vacancy = models.CharField(verbose_name="여석", max_length=200, default="미정")
     major_name = models.CharField(verbose_name="전공 이름", max_length=20, default="미정")
 
     evaluation_method_type = [
