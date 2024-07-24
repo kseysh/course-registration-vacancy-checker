@@ -17,11 +17,10 @@ def crawl_course_info(request):
     for major in majors:
         select = Select(driver.find_element(By.NAME, 'ddlDept'))
         major_value = major["value"]
+        major_name = major["name"]
         select.select_by_value(major_value)
         driver.find_element(By.CSS_SELECTOR, "#ibtnSearch1").click()
-        driver.implicitly_wait(3)
-            
-        # ------------ 아 -----------
+        driver.implicitly_wait(1)
         
         rows = driver.find_elements(By.CSS_SELECTOR, '#dgList > tbody > tr')
 
@@ -38,6 +37,7 @@ def crawl_course_info(request):
             
             try:
                 course, course_is_created = Course.objects.get_or_create(
+                    major_name = major_name,
                     code = code,
                     name = name,
                     grade = grade,
@@ -48,10 +48,10 @@ def crawl_course_info(request):
                     evaluation_method = evaluation_method,
                     remarks = remarks,
                 )
-            except:
-                print("course code" + course.code, "cource name " + course.name, "major value" + major_value)
+            except Exception as e:
+                print("error: " + e , " major value: " + major_value)
             
             if course_is_created:
                 print(course.name)
-
+    driver.quit()
     return HttpResponse("success!")
