@@ -12,7 +12,8 @@
             <th scope="col" style="width:12%;">시간 및 강의실</th>
             <th scope="col" style="width:5%;">담당교수</th>
             <th scope="col" style="width:5%;">평가방식</th>
-            <th scope="col" style="width:8%;">비고</th>
+            <th scope="col" style="width:8%;">학과</th>
+            <th scope="col" style="width:5%;">비고</th>
             <th scope="col" style="width:10%;">여석</th>
         </tr>
     </thead>
@@ -28,7 +29,8 @@
             <th scope="col" style="width:12%;">{{ course.time_and_classroom }}</th>
             <th scope="col" style="width:5%;">{{ course.professor }}</th>
             <th scope="col" style="width:5%;">{{ course.evaluation_method }}</th>
-            <th scope="col" style="width:8%;">{{ course.remarks }}</th>
+            <th scope="col" style="width:5%;">{{ course.major_name }}</th>
+            <th scope="col" style="width:5%;">{{ course.remarks }}</th>
             <th scope="col" style="width:10%;">{{ course.vacancy }}</th>
         </tr>
         {% endfor %}
