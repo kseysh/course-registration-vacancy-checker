@@ -71,9 +71,9 @@ def crawl_course_vacancy(request):
     try:
         driver.get('https://sugang.inha.ac.kr/sugang/SU_51001/Lec_Time_Search.aspx?callPage=Sugang_SaveAB')
         driver.implicitly_wait(1)
-        driver.add_cookie({"name":"ITISSugang", "value":"bigo=L+0gnQBAXrw=&grade=mXv8e05CoQE=&nowno=pcTw/Y5/29A=&change_Code=iWpeROjkMjo=&ite_yn=qp7HMQ5dvNs=&pcode=G2D6xtRFEPg=&kicho=qp7HMQ5dvNs=&date14=1mhtp5MGVj4ZyGL97/iKtw==&mincredit=bOFS5/mMm6U=&maxcredit=yeQGi3jUVk8=&pre_jaesu=vP8vv5LN+dI=&date_change=qvwd1Oz5ZGqaEUebf2E/LSfGAkGF2++d&date_jaesu=tYNaCmMN8Wo=&majors=2WdbESNCge0=&major_name=qp7HMQ5dvNs=&bokhag=qp7HMQ5dvNs=&dept_code=JltGKE1I2Aw=&major_code=2WdbESNCge0="})
+        driver.add_cookie({"name":"ITISSugang", "value":"value"})
         driver.implicitly_wait(1)
-        driver.add_cookie({"name":"ITISSugangHome", "value":"Grade=mXv8e05CoQE=&Term=9XCOn7R1QMI=&Kname=rdYyC0XmbRQaHBk04DY60A==&Dept_kname=drIw5mzH3OD3n1hdvkfNoeZYVjEPTSa5&Major_kname=drIw5mzH3ODvn8/JKmVK+g==&Manager=ccP/ybUZCSU=&Email=8DlY5mNAnBl8QkwNSuMr7/8U7pxOBfvH&Stno=6O/gxAPQyfIU9UuhsCZr9A==&Dept_code=JltGKE1I2Aw=&Major_code=2WdbESNCge0=&ClientAddress=ADz5uS4qFkj6R9jwCqq5HA==&Ename=YNTNW7TuyEi8dJr/TwcPUw==&Dept_Ename=XC9PjrV2jtMcOfESGC/kZIp5AzpLxfvv&Major_ename=XC9PjrV2jtMcOfESGC/kZIp5AzpLxfvv&pwChgPop=ccP/ybUZCSU="})
+        driver.add_cookie({"name":"ITISSugangHome", "value":"value"})
         driver.implicitly_wait(1)
         
         for major in majors[65:]:
