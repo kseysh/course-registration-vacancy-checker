@@ -10,11 +10,8 @@ from crawler.crawled_info import majors_dictionary
 
 @ratelimit(key='ip', rate='100/h', block=True) # 한 시간에 100번만 활용할 수 있다.
 def main(request):
-    course_list = Course.objects.all()
-
     template = loader.get_template("main.html")
     context = {
-        "course_list": course_list,
         "majors": majors_list.majors,
     }
     return HttpResponse(template.render(context, request))
