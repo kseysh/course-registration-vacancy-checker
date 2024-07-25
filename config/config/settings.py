@@ -18,7 +18,7 @@ def get_secret(setting,secrets_dict = secrets):
 
 SECRET_KEY = get_secret('SECRET_KEY')
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -68,8 +68,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': get_secret('DB_ENGINE'),
+        'NAME': get_secret('DB_NAME'),
+        'USER' : get_secret('DB_USER'),
+        'PASSWORD' : get_secret('DB_PW'),
+        'HOST' : get_secret('DB_HOST'),
+        'PORT' : get_secret('DB_PORT'),
     }
 }
 
