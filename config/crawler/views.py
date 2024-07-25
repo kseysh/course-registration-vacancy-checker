@@ -1,4 +1,3 @@
-import time
 from django.http import HttpResponse
 
 from selenium import webdriver
@@ -40,25 +39,28 @@ def crawl_course_info(request):
                 remarks = row.find_element(By.CSS_SELECTOR, "td:nth-child(10)").text.strip() # 비고
                 
                 try:
-                    course, course_is_created = Course.objects.get_or_create(
-                        major_name = major_name,
-                        code = code,
-                        name = name,
-                        grade = grade,
-                        credit = credit,
-                        subject = subject,
-                        time_and_classroom = time_and_classroom,
-                        professor = professor,
-                        evaluation_method = evaluation_method,
-                        remarks = remarks,
-                    )
+                    if Course.objects.filter(code = code).exists():
+                        pass
+                    else:
+                        course, course_is_created = Course.objects.get_or_create(
+                            major_name = major_name,
+                            code = code,
+                            name = name,
+                            grade = grade,
+                            credit = credit,
+                            subject = subject,
+                            time_and_classroom = time_and_classroom,
+                            professor = professor,
+                            evaluation_method = evaluation_method,
+                            remarks = remarks,
+                        )
                 except Exception as e:
-                    print("error: " + e , " major value: " + major_value)
-                
-                if course_is_created:
-                    print(course.name)
+                    print("\n---------------\nerror! " + " major value: " + major_value + "\n" +"course name: "+ course.name + "\n---------------\n")
+    except TypeError as e:
+        print("Type error")
     except Exception as e:
-        print("error: " + e)
+        print("undefined error")
+    
     finally:
         driver.quit()
     return HttpResponse("success!")
