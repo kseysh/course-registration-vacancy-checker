@@ -8,7 +8,7 @@ from .models import *
 from crawler.crawled_info import majors_list
 from crawler.crawled_info import majors_dictionary
 
-@ratelimit(key='ip', rate='100/h', block=True) # 한 시간에 100번만 활용할 수 있다.
+
 def main(request):
     template = loader.get_template("main.html")
     context = {
@@ -16,7 +16,7 @@ def main(request):
     }
     return HttpResponse(template.render(context, request))
 
-@ratelimit(key='ip', rate='100/h', block=True) # 한 시간에 100번만 활용할 수 있다.
+
 def search_course(request):
     major_value = request.GET.get('major_value')
     if major_value:
