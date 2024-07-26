@@ -30,7 +30,7 @@ def search_course(request):
     if course_code:
         return get_all_course_by_code(request, course_code)
 
-    return get_all_course(request)
+    raise Http404("페이지를 찾을 수 없습니다.")
 
 def get_all_course_by_major(request, major_value):
     search_parameter_validator(major_value)

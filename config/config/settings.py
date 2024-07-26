@@ -18,7 +18,7 @@ def get_secret(setting,secrets_dict = secrets):
 
 SECRET_KEY = get_secret('SECRET_KEY')
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
