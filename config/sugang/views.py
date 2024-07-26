@@ -69,11 +69,11 @@ def get_all_course_by_code(request, course_code):
     }
     return HttpResponse(template.render(context, request))
 
-def get_all_course(request):
-    return Course.objects.all()
-
 def search_parameter_validator(param):
     if param == "" or param == None:
         raise Http404("search parameter does not null or empty")
     if len(param) < 3:
         raise Http404("search parameter must greater than 3")
+
+# def get_all_course(request):
+#     return Course.objects.all()
