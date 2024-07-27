@@ -15,6 +15,7 @@ secrets.json
 
 # etc
 .DS_Store
+notification.md
 
 # py file
 config/major_creator.py
@@ -22,5 +23,6 @@ config/major_creator.py
 # migrations
 config/sugang/migrations/**
 config/craswer/migrations/**
+
 # static
 static
