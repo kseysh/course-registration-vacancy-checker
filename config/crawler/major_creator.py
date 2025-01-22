@@ -121,4 +121,4 @@ print("\n\n------------------\n\n")
 majors_list = json.loads(majors_json)
 
 for major in majors_list:
-    print(f"'{major['value']}': '{major['name']} / {major['name']}',")
+    print(f"'{major['value']}': '{major['name']}',")
