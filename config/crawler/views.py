@@ -15,13 +15,13 @@ from sugang.models import *
 import time
 
 def crawl_course_info(request):
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--headless') # Browser를 GUI없이 백그라운드에서 실행
+    chrome_options.add_argument('--no-sandbox') # 보안 취약점에 노출될 가능성을 최소화하기 위해 사용되는 sandbox 보호 기능 해제
     service = Service("/Users/transfer_kk/Desktop/chromedriver-mac-arm64/chromedriver")
-    driver = webdriver.Chrome(service=service)
-    driver.implicitly_wait(3)
-    
-    url = 'https://sugang.inha.ac.kr/sugang/SU_51001/Lec_Time_Search.aspx?callPage=Sugang_SaveAB'
-    driver.get(url)
-    
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    wait = WebDriverWait(driver, 10)
+    driver.get('https://sugang.inha.ac.kr/sugang/SU_51001/Lec_Time_Search.aspx?callPage=Sugang_SaveAB')
     start = time.time()
     try:
         # for major in majors:
@@ -31,7 +31,7 @@ def crawl_course_info(request):
             major_name = major["name"]
             select.select_by_value(major_value)
             driver.find_element(By.CSS_SELECTOR, "#ibtnSearch1").click()
-            driver.implicitly_wait(1)
+            wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '#dgList > tbody > tr')))
             rows = driver.find_elements(By.CSS_SELECTOR, '#dgList > tbody > tr')
 
             for row in rows:
@@ -49,7 +49,7 @@ def crawl_course_info(request):
                     if Course.objects.filter(code = code).exists():
                         pass
                     else:
-                        course, course_is_created = Course.objects.get_or_create(
+                        course = Course.objects.create(
                             major_name = major_name,
                             code = code,
                             name = name,
@@ -62,14 +62,12 @@ def crawl_course_info(request):
                             remarks = remarks,
                         )
                 except Exception as e:
-                    print("\n---------------\nerror! " + " major value: " + major_value + "\n" +"course name: "+ course.name + "\n---------------\n")
-                    print("error text : " + e)
+                    print("\n---------------\nerror! " + " major value: " + major_name + "\n" +"course name: "+ name + "\n---------------\n")
+            print("\n-----------\n" + major_name+" is OK" + "\n-----------\n")   
     except TypeError as e:
         print("Type error")
-        print("error text : " + e)
     except Exception as e:
         print("undefined error")
-        print("error text : " + e)
     finally:
         driver.quit()
     end = time.time()
@@ -89,7 +87,7 @@ def crawl_course_vacancy(request):
         driver.get('https://sugang.inha.ac.kr/sugang/SU_51001/Lec_Time_Search.aspx?callPage=Sugang_SaveAB')
         driver.add_cookie({"name":"ITISSugang", "value":"value"})
         driver.add_cookie({"name":"ITISSugangHome", "value":"value"})
-        
+        # IO bound
         code_prefixes = set()    
         # for major in majors: 
         for major in test_majors:
@@ -97,6 +95,7 @@ def crawl_course_vacancy(request):
             select.select_by_value(major["value"])
             driver.find_element(By.CSS_SELECTOR, "#ibtnSearch1").click()
             wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '#dgList > tbody > tr')))
+            # IO bound
             rows = driver.find_elements(By.CSS_SELECTOR, "#dgList > tbody > tr")
             course_list = [] 
             new_courses = []
@@ -106,8 +105,8 @@ def crawl_course_vacancy(request):
                 code_prefixes.add(code_prefix)
                 row.find_element(By.CSS_SELECTOR, "td:nth-child(11) > input ").click()
                 driver.switch_to.window(driver.window_handles[1])
-                
                 wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '#dgList > tbody > tr')))
+                # IO bound
                 rows2 = driver.find_elements(By.CSS_SELECTOR, "#dgList > tbody > tr")
                 for row2 in rows2:
                     code = row2.find_element(By.CSS_SELECTOR, "td:nth-child(3)").text.strip()
@@ -127,7 +126,7 @@ def crawl_course_vacancy(request):
                 driver.switch_to.window(driver.window_handles[0])
             
             Course.objects.bulk_update(course_list, ['vacancy'])
-            Course.objects.bulk_update(new_courses, ['name', 'professor'])
+            Course.objects.bulk_update(new_courses, ['name', 'professor', 'vacancy'])
             print("\n-----------\n" + major["name"]+" is OK" + "\n-----------\n")   
     except NoSuchElementException as e:
         print("error: " + e.msg)
