@@ -5,7 +5,7 @@ class Course(models.Model):
     code = models.CharField(verbose_name="학수번호", max_length=15, unique = True)
     name = models.CharField(verbose_name="과목명", max_length=100)
     grade = models.CharField(verbose_name="학년", max_length=10, default="0")
-    credit = models.DecimalField(verbose_name="학점", max_digits=2, decimal_places=1, default= 0.0)
+    credit = models.DecimalField(verbose_name="학점", max_digits=3, decimal_places=1, default= 0.0)
     professor = models.CharField(verbose_name="담당교수", max_length=100, default="담당교수 미정")
     remarks = models.CharField(verbose_name="비고", max_length=200, default="")
     vacancy = models.CharField(verbose_name="여석", max_length=200, default="미정")
