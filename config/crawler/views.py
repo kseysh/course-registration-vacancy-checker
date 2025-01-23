@@ -5,9 +5,14 @@ from selenium.webdriver.support.select import Select
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as ec
 
 from .crawled_info.majors_list import majors
+from .crawled_info.test_majors_list import test_majors
 from sugang.models import *
+
+import time
 
 def crawl_course_info(request):
     service = Service("/Users/transfer_kk/Desktop/chromedriver-mac-arm64/chromedriver")
@@ -17,8 +22,10 @@ def crawl_course_info(request):
     url = 'https://sugang.inha.ac.kr/sugang/SU_51001/Lec_Time_Search.aspx?callPage=Sugang_SaveAB'
     driver.get(url)
     
+    start = time.time()
     try:
-        for major in majors:
+        # for major in majors:
+        for major in test_majors:
             select = Select(driver.find_element(By.NAME, 'ddlDept'))
             major_value = major["value"]
             major_name = major["name"]
@@ -56,58 +63,78 @@ def crawl_course_info(request):
                         )
                 except Exception as e:
                     print("\n---------------\nerror! " + " major value: " + major_value + "\n" +"course name: "+ course.name + "\n---------------\n")
+                    print("error text : " + e)
     except TypeError as e:
         print("Type error")
+        print("error text : " + e)
     except Exception as e:
         print("undefined error")
-    
+        print("error text : " + e)
     finally:
         driver.quit()
-    return HttpResponse("success!")
-
-def crawl_course_vacancy(request):
-    service = Service("/Users/transfer_kk/Desktop/chromedriver-mac-arm64/chromedriver")
-    driver = webdriver.Chrome(service=service)
-    driver.implicitly_wait(3)
+    end = time.time()
+    print("excute time : " + f"{end - start:.5f} sec")
+    return HttpResponse(content="success!")
     
+def crawl_course_vacancy(request):
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--headless') # Browser를 GUI없이 백그라운드에서 실행
+    chrome_options.add_argument('--no-sandbox') # 보안 취약점에 노출될 가능성을 최소화하기 위해 사용되는 sandbox 보호 기능 해제
+    service = Service("/Users/transfer_kk/Desktop/chromedriver-mac-arm64/chromedriver")
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    wait = WebDriverWait(driver, 10)
+    
+    start = time.time()
     try:
         driver.get('https://sugang.inha.ac.kr/sugang/SU_51001/Lec_Time_Search.aspx?callPage=Sugang_SaveAB')
-        driver.implicitly_wait(1)
         driver.add_cookie({"name":"ITISSugang", "value":"value"})
-        driver.implicitly_wait(1)
         driver.add_cookie({"name":"ITISSugangHome", "value":"value"})
-        driver.implicitly_wait(1)
         
-        for major in majors[65:]:
+        code_prefixes = set()    
+        # for major in majors: 
+        for major in test_majors:
             select = Select(driver.find_element(By.NAME, 'ddlDept'))
-            major_value = major["value"]
-            select.select_by_value(major_value)
+            select.select_by_value(major["value"])
             driver.find_element(By.CSS_SELECTOR, "#ibtnSearch1").click()
-            rows = driver.find_elements(By.CSS_SELECTOR, '#dgList > tbody > tr')
-            course_list = []
+            wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '#dgList > tbody > tr')))
+            rows = driver.find_elements(By.CSS_SELECTOR, "#dgList > tbody > tr")
+            course_list = [] 
+            new_courses = []
             for row in rows:
+                code_prefix = row.find_element(By.CSS_SELECTOR, "td:nth-child(1) > a > font").text.strip().split('-')[0] # 학수번호 앞 자리
+                if(code_prefix in code_prefixes) : continue
+                code_prefixes.add(code_prefix)
                 row.find_element(By.CSS_SELECTOR, "td:nth-child(11) > input ").click()
-                driver.implicitly_wait(5)
                 driver.switch_to.window(driver.window_handles[1])
-                rows2 = driver.find_elements(By.CSS_SELECTOR, '#dgList > tbody > tr')
+                
+                wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '#dgList > tbody > tr')))
+                rows2 = driver.find_elements(By.CSS_SELECTOR, "#dgList > tbody > tr")
                 for row2 in rows2:
                     code = row2.find_element(By.CSS_SELECTOR, "td:nth-child(3)").text.strip()
-                    vacancy = row2.find_element(By.CSS_SELECTOR, "td:nth-child(8)").text.strip()
                     course,course_is_created = Course.objects.get_or_create(code = code)
-                    course.vacancy = vacancy
+                    course.vacancy = row2.find_element(By.CSS_SELECTOR, "td:nth-child(8)").text.strip()
+                    
                     if course_is_created:
-                        course.name = "미정"
-                        course.save()
+                        name = row2.find_element(By.CSS_SELECTOR, "td:nth-child(4)").text.strip()
+                        professor = row2.find_element(By.CSS_SELECTOR, "td:nth-child(6)").text.strip()
+                        course.name = name
+                        course.professor = professor
+                        new_courses.append(course)
+                        print("warn: (name: " + name + ", code: " + code + ", professor: " + professor)
                     else:
                         course_list.append(course)
                 driver.close()
                 driver.switch_to.window(driver.window_handles[0])
-            if course_list:
-                Course.objects.bulk_update(course_list, ['vacancy'])
+            
+            Course.objects.bulk_update(course_list, ['vacancy'])
+            Course.objects.bulk_update(new_courses, ['name', 'professor'])
             print("\n-----------\n" + major["name"]+" is OK" + "\n-----------\n")   
     except NoSuchElementException as e:
         print("error: " + e.msg)
     finally:
         driver.quit()
-    return HttpResponse("success!")
+    
+    end = time.time()
+    print("excute time : " + f"{end - start:.5f} sec")
+    return HttpResponse(content="success!")
     
