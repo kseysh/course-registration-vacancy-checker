@@ -1,8 +1,6 @@
 from django.http import HttpResponse, Http404
 from django.shortcuts import render
 from django.template import loader
-from django_ratelimit.decorators import ratelimit
-
 
 from .models import *
 from crawler.crawled_info import majors_list
