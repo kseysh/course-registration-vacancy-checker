@@ -9,10 +9,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 
 from .crawled_info.majors_list import majors
-from .crawled_info.test_majors_list import test_majors
+from .crawled_info.kita_majors_list import kitas
 from sugang.models import *
-
 import time
+
 
 def crawl_course_info(request):
     chrome_options = webdriver.ChromeOptions()
@@ -23,17 +23,21 @@ def crawl_course_info(request):
     wait = WebDriverWait(driver, 10)
     driver.get('https://sugang.inha.ac.kr/sugang/SU_51001/Lec_Time_Search.aspx?callPage=Sugang_SaveAB')
     start = time.time()
+    is_crawl_majors = True
+    lists = majors if is_crawl_majors else kitas
+    
     try:
-        # for major in majors:
-        for major in test_majors:
-            select = Select(driver.find_element(By.NAME, 'ddlDept'))
+        for major in lists:
+            select = Select(driver.find_element(By.NAME, 'ddlDept')) if is_crawl_majors else Select(driver.find_element(By.NAME, 'ddlKita'))
             major_value = major["value"]
             major_name = major["name"]
             select.select_by_value(major_value)
-            driver.find_element(By.CSS_SELECTOR, "#ibtnSearch1").click()
+            if(is_crawl_majors) : driver.find_element(By.CSS_SELECTOR, "#ibtnSearch1").click()    
+            else : driver.find_element(By.CSS_SELECTOR, "#ibtnSearch2").click()
             wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '#dgList > tbody > tr')))
             rows = driver.find_elements(By.CSS_SELECTOR, '#dgList > tbody > tr')
-
+            update_lists = [] 
+            create_lists = []
             for row in rows:
                 code = row.find_element(By.CSS_SELECTOR, "td:nth-child(1) > a > font").text.strip() # 학수번호
                 name = row.find_element(By.CSS_SELECTOR, "td:nth-child(3)").text.strip() # 과목명
@@ -43,26 +47,25 @@ def crawl_course_info(request):
                 time_and_classroom = row.find_element(By.CSS_SELECTOR, "td:nth-child(7)").text.strip() # 시간 및 강의실
                 professor = row.find_element(By.CSS_SELECTOR, "td:nth-child(8)").text.strip() # 교수
                 evaluation_method = row.find_element(By.CSS_SELECTOR, "td:nth-child(9)").text.strip() # 평가 방식
-                remarks = row.find_element(By.CSS_SELECTOR, "td:nth-child(10)").text.strip() # 비고
-                
+                remarks = row.find_element(By.CSS_SELECTOR, "td:nth-child(10)").text.strip() # 비고    
+                course = Course(
+                    code = code, 
+                    name = name,
+                    grade = grade,
+                    credit = credit,
+                    subject = subject,
+                    time_and_classroom = time_and_classroom,
+                    professor = professor,
+                    evaluation_method = evaluation_method,
+                    remarks = remarks
+                )   
                 try:
-                    if Course.objects.filter(code = code).exists():
-                        pass
-                    else:
-                        course = Course.objects.create(
-                            major_name = major_name,
-                            code = code,
-                            name = name,
-                            grade = grade,
-                            credit = credit,
-                            subject = subject,
-                            time_and_classroom = time_and_classroom,
-                            professor = professor,
-                            evaluation_method = evaluation_method,
-                            remarks = remarks,
-                        )
+                    if(Course.objects.exists(code = code)) : update_lists.append(course)
+                    else : create_lists.append(course)
                 except Exception as e:
                     print("\n---------------\nerror! " + " major value: " + major_name + "\n" +"course name: "+ name + "\n---------------\n")
+            Course.objects.bulk_update(update_lists, ['major_name', 'name', 'grade', 'credit', 'subject', 'time_and_classroom', 'professor', 'evaluation_method', 'remarks'])
+            Course.objects.bulk_create(create_lists)
             print("\n-----------\n" + major_name+" is OK" + "\n-----------\n")   
     except TypeError as e:
         print("Type error")
@@ -73,6 +76,8 @@ def crawl_course_info(request):
     end = time.time()
     print("excute time : " + f"{end - start:.5f} sec")
     return HttpResponse(content="success!")
+  
+  
     
 def crawl_course_vacancy(request):
     chrome_options = webdriver.ChromeOptions()
@@ -85,15 +90,18 @@ def crawl_course_vacancy(request):
     start = time.time()
     try:
         driver.get('https://sugang.inha.ac.kr/sugang/SU_51001/Lec_Time_Search.aspx?callPage=Sugang_SaveAB')
-        driver.add_cookie({"name":"ITISSugang", "value":"value"})
-        driver.add_cookie({"name":"ITISSugangHome", "value":"value"})
+        driver.add_cookie({"name":"ITISSugang", "value":"bigo=L+0gnQBAXrw=&grade=mXv8e05CoQE=&nowno=pcTw/Y5/29A=&change_Code=bGCcVaPhR+4=&ite_yn=qp7HMQ5dvNs=&pcode=G2D6xtRFEPg=&kicho=qp7HMQ5dvNs=&date14=LAPox8wwk7+53PT00PIU0A==&mincredit=bOFS5/mMm6U=&maxcredit=6gWfIS2AkdY=&pre_jaesu=vP8vv5LN+dI=&date_change=Z/RwgE+bG2Df3BjdH3eM3CwlA6y76crT&date_jaesu=CCQnQzTWZfM=&majors=2WdbESNCge0=&major_name=qp7HMQ5dvNs=&bokhag=qp7HMQ5dvNs=&dept_code=JltGKE1I2Aw=&major_code=2WdbESNCge0="})
+        driver.add_cookie({"name":"ITISSugangHome", "value":"Grade=mXv8e05CoQE=&Term=9XCOn7R1QMI=&Kname=rdYyC0XmbRQaHBk04DY60A==&Dept_kname=drIw5mzH3OD3n1hdvkfNoeZYVjEPTSa5&Major_kname=drIw5mzH3ODvn8/JKmVK+g==&Manager=ccP/ybUZCSU=&Email=8DlY5mNAnBl8QkwNSuMr7/8U7pxOBfvH&Stno=6O/gxAPQyfIU9UuhsCZr9A==&Dept_code=JltGKE1I2Aw=&Major_code=2WdbESNCge0=&ClientAddress=ADz5uS4qFkikc8JqOUuFHA==&Ename=YNTNW7TuyEi8dJr/TwcPUw==&Dept_Ename=XC9PjrV2jtMcOfESGC/kZIp5AzpLxfvv&Major_ename=XC9PjrV2jtMcOfESGC/kZIp5AzpLxfvv&pwChgPop=ccP/ybUZCSU="})
         # IO bound
         code_prefixes = set()    
-        # for major in majors: 
-        for major in test_majors:
-            select = Select(driver.find_element(By.NAME, 'ddlDept'))
-            select.select_by_value(major["value"])
-            driver.find_element(By.CSS_SELECTOR, "#ibtnSearch1").click()
+        is_crawl_majors = True
+        lists = majors if is_crawl_majors else kitas
+        for major in lists: 
+            select = Select(driver.find_element(By.NAME, 'ddlDept')) if is_crawl_majors else Select(driver.find_element(By.NAME, 'ddlKita'))
+            select.select_by_value(major["value"])            
+            if is_crawl_majors : driver.find_element(By.CSS_SELECTOR, "#ibtnSearch1").click()
+            else : driver.find_element(By.CSS_SELECTOR, "#ibtnSearch2").click()
+
             wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, '#dgList > tbody > tr')))
             # IO bound
             rows = driver.find_elements(By.CSS_SELECTOR, "#dgList > tbody > tr")
